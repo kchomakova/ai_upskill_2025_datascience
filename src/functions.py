@@ -78,14 +78,16 @@ def calculate_pair_wise_chi_square_test(dataset: pd.DataFrame, p_value_threshold
     output_df = pd.DataFrame(columns=['first_col', 'second_col', 'chi_square_stat', 'p_value'])
 
     for pair in pairs:
-        contingency_table = pd.crosstab(dataset[pair[0]], dataset[pair[1]])
-        chi2_stat, p_val = chi2_contingency(contingency_table)
+        contingency_table = pd.crosstab(dataset_categorical[pair[0]], dataset_categorical[pair[1]])
+        chi2_stat, p_val  = chi2_contingency(contingency_table)[:2]
 
-        if p_val <= 0.1:
+        if p_val <= p_value_threshold:
             new_row = pd.DataFrame({'first_col': [pair[0]], 'second_col': [pair[1]], 'chi_square_stat': [chi2_stat], 'p_value': [p_val]})
-            output = pd.concat([output, new_row], ignore_index=True)
+            output_df = pd.concat([output_df, new_row], ignore_index=True)
 
-        return output_df.sort_values(by = ['first_col', 'second_col'])
+        output_df = output_df.sort_values(by = ['first_col', 'second_col'])
+
+    return output_df
     
 
 def drop_cols_no_cardinality(dataset: pd.DataFrame) -> pd.DataFrame:
@@ -115,10 +117,10 @@ def standardize_numeric_variables(dataset: pd.DataFrame) -> pd.DataFrame:
         A DataFrame with standardized numeric variables.
     """
 
-    datase_numeric = extract_numerical_cols(dataset)
+    dataset_numeric = extract_numerical_cols(dataset)
     
     scaler = StandardScaler()
-    standardized_data = scaler.fit_transform(datase_numeric)
-    standardized_df = pd.DataFrame(standardized_data, columns=datase_numeric.columns)
+    standardized_data = scaler.fit_transform(dataset_numeric)
+    standardized_df = pd.DataFrame(standardized_data, columns=dataset_numeric.columns)
     
     return standardized_df
