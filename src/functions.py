@@ -17,10 +17,10 @@ def extract_categorical_cols(dataset: pd.DataFrame) -> pd.DataFrame:
         A DataFrame containing only the integer columns from the input dataset.
     """
 
-    dataset = dataset.select_dtypes(include='int')
-    dataset = dataset[[col for col in dataset.columns if col not in ['Age','PatientID']]]
+    dataset_cat = dataset.select_dtypes(include='int')
+    dataset_cat = dataset_cat[[col for col in dataset_cat.columns if col not in ['Age','PatientID']]]
     
-    return dataset
+    return dataset_cat
 
 
 def extract_numerical_cols(dataset: pd.DataFrame) -> pd.DataFrame:
@@ -35,10 +35,10 @@ def extract_numerical_cols(dataset: pd.DataFrame) -> pd.DataFrame:
         A DataFrame containing only the float columns from the input dataset.
     """
 
-    dataset = dataset.select_dtypes(include = 'float')
-    dataset = dataset[list(dataset.columns) + ['Age']]
+    dataset_num = dataset.select_dtypes(include = 'float')
+    dataset_num = dataset[list(dataset_num.columns) + ['Age']]
     
-    return dataset
+    return dataset_num
 
 
 def calculate_pair_wise_correlation(dataset: pd.DataFrame) -> pd.DataFrame:
@@ -88,7 +88,7 @@ def calculate_pair_wise_chi_square_test(dataset: pd.DataFrame, p_value_threshold
         return output_df.sort_values(by = ['first_col', 'second_col'])
     
 
-def drop_cols_no_cardinality(dataset: pd.Dataframe) -> pd.DataFrame:
+def drop_cols_no_cardinality(dataset: pd.DataFrame) -> pd.DataFrame:
     """
     Drops columns that have no cardinality (i.e., all values are the same) from the DataFrame.
 
@@ -100,10 +100,11 @@ def drop_cols_no_cardinality(dataset: pd.Dataframe) -> pd.DataFrame:
     """
     
     cols_to_drop = [col for col in dataset.columns if dataset[col].nunique() <= 1]
-    return dataset.drop(columns=cols_to_drop, axis = 1, inplace = True)
+    dataset = dataset.drop(columns=cols_to_drop, axis = 1)
+    return dataset
 
 
-def standardize_numeric_variables(dataset: pd.Dataframe) -> pd.DataFrame:
+def standardize_numeric_variables(dataset: pd.DataFrame) -> pd.DataFrame:
     """
     Standardizes the numeric variables in the DataFrame by subtracting the mean and dividing by the standard deviation.
 
